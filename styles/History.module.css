@@ -1,0 +1,22 @@
+.left_column {
+  background-color: white;
+  border: 1px solid white;
+  border-radius: 10px;
+  color: #6379f4;
+}
+
+.left_column_menu_text {
+  color: #6379f4;
+  text-decoration: none;
+}
+
+.left_column_menu_text:hover {
+  text-decoration: none;
+  color: #6379f4;
+}
+
+.right_column {
+  background-color: white;
+  border: 1px solid white;
+  border-radius: 10px;
+}
