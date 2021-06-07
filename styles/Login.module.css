@@ -75,6 +75,7 @@
   background-color: #7e90f7;
   color: white;
   width: 100%;
+  border-radius: 10px;
 }
 
 .signin_button:hover {
@@ -82,6 +83,7 @@
   background-color: white;
   color: #6379f4;
   width: 100%;
+  border-radius: 10px;
 }
 
 .signup_text_link {

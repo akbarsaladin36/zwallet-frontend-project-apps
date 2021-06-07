@@ -7,7 +7,7 @@ export default function Navbar() {
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
         <div className="container">
-          <a className={`${styles.navbar_brand_text} navbar-brand`} href="#">
+          <a className={`${styles.navbar_brand_text} navbar-brand`} href="/">
             Zwallet
           </a>
           <button

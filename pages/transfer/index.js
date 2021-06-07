@@ -1,6 +1,6 @@
 import Layout from "../../components/Layout";
 import Navbar from "../../components/module/Navbar";
-import styles from "../../styles/History.module.css";
+import styles from "../../styles/Transfer.module.css";
 import Link from "next/link";
 import Footer from "../../components/module/Footer";
 import Image from "next/image";
@@ -10,9 +10,9 @@ import { WiDirectionUp } from "react-icons/wi";
 import { BiPlus } from "react-icons/bi";
 import { FiUser } from "react-icons/fi";
 
-export default function History() {
+export default function Transfer() {
   return (
-    <Layout title="Transaction History">
+    <Layout title="Transfer">
       <Navbar />
       <div className="container">
         <div className="row mt-5 justify-content-center">
@@ -77,12 +77,11 @@ export default function History() {
             </div>
           </div>
           <div className={`${styles.right_column} col-7 ms-3 shadow`}>
-            <p>Transaction History</p>
-            <p className="text-muted">This Week</p>
+            <p className="mt-3">Transfer Money</p>
             <div className="row">
-              <div className="col">
+              <div className={`${styles.right_column_1} col mt-5 shadow`}>
                 <div className="row">
-                  <div className="col-3">
+                  <div className="col-2">
                     <Image
                       src="/img/default-profile-picture.jpg"
                       alt="profile user"
@@ -90,78 +89,54 @@ export default function History() {
                       height={60}
                     />
                   </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Transfer</p>
+                  <div className="col-8">
+                    <p>Nama</p>
+                    <p className="text-muted">No Hp</p>
                   </div>
                 </div>
-              </div>
-              <div className="col d-flex justify-content-end text-success">
-                <p className="mt-4">+Rp.50.000</p>
               </div>
             </div>
-            <div className="row">
-              <div className="col">
+            <p className={`${styles.right_column_text_1} text-muted mt-3`}>
+              Type the amount you want to transfer and then press continue to
+              the next steps.
+            </p>
+            <div className="row mt-5">
+              <div className="col d-flex justify-content-center">
                 <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Subscription</p>
+                  <div className="col-12 text-center mx-auto">
+                    <form>
+                      <div className="mb-3">
+                        <input
+                          type="text"
+                          className={styles.right_column_input_1}
+                          id="exampleFormControlInput1"
+                          placeholder="00.0"
+                          size="10"
+                        />
+                      </div>
+                      <p>Rp.120.000 Available</p>
+                      <div className="mb-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="exampleFormControlInput1"
+                          placeholder="Add some notes"
+                          size="10"
+                        />
+                      </div>
+                      <div className="row">
+                        <div className="col-12">
+                          <button
+                            type="submit"
+                            className={`${styles.right_column_button_1} btn mb-3 mt-5`}
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 </div>
-              </div>
-              <div className="col d-flex justify-content-end text-danger">
-                <p className="mt-4">-Rp.149.000</p>
-              </div>
-            </div>
-            <p className="text-muted mt-5">This Month</p>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Transfer</p>
-                  </div>
-                </div>
-              </div>
-              <div className="col d-flex justify-content-end text-success">
-                <p className="mt-4">+Rp.150.000</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Subscription</p>
-                  </div>
-                </div>
-              </div>
-              <div className="col d-flex justify-content-end text-danger">
-                <p className="mt-4">-Rp.249.000</p>
               </div>
             </div>
           </div>

@@ -12,10 +12,6 @@ module.exports = {
         source: "/register",
         destination: "/auth/register",
       },
-      {
-        source: "/transfer",
-        destination: "/search_receiver",
-      },
     ];
   },
 };

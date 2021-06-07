@@ -40,7 +40,7 @@ export default function SearchReceiver() {
                   </Link>
                 </div>
                 <div className="col mx-3 my-4">
-                  <Link href="#">
+                  <Link href="/top_up">
                     <a className={styles.left_column_menu_text}>
                       <i>
                         <BiPlus />
@@ -81,7 +81,7 @@ export default function SearchReceiver() {
             <form>
               <div className="input-group mb-3">
                 <button
-                  class="btn btn-outline-secondary"
+                  className="btn btn-outline-secondary"
                   type="button"
                   id="button-addon1"
                 >
