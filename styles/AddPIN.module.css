@@ -1,0 +1,97 @@
+.left_column {
+  background-color: #6379f4;
+  height: 1150px;
+}
+
+.image_header_position {
+  position: absolute;
+  top: 18%;
+  left: 6%;
+  bottom: 0;
+  right: 0;
+  width: 500px;
+}
+
+.image_header_position_2 {
+  position: absolute;
+  top: 9%;
+  left: -45px;
+  bottom: 0;
+  right: 0;
+  width: 845px;
+}
+
+.zwallet_text {
+  position: absolute !important;
+  top: 5%;
+  left: 8%;
+  bottom: 0;
+  right: 0;
+  color: white !important;
+  font-weight: bold;
+  width: 95px;
+  height: 95px;
+}
+
+.zwallet_text_2 {
+  position: absolute !important;
+  top: 100%;
+  left: 8%;
+  bottom: 0;
+  right: 0;
+  color: white !important;
+  font-weight: bold;
+  width: 500px;
+}
+
+.zwallet_text_3 {
+  position: absolute !important;
+  top: 110%;
+  left: 8%;
+  bottom: 0;
+  right: 0;
+  color: white !important;
+  width: 590px;
+  height: 400px;
+  line-height: 2em;
+  word-spacing: 8px;
+}
+
+.signup_text {
+  width: 390px !important;
+  font-weight: bold;
+}
+
+.signup_text_2 {
+  width: 420px;
+}
+
+.form_size {
+  width: 400px;
+}
+
+.signin_button {
+  border-color: #6379f4;
+  background-color: #7e90f7;
+  color: white;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.signin_button:hover {
+  border-color: #6379f4;
+  background-color: white;
+  color: #6379f4;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.signup_text_link {
+  color: #6379f4;
+  text-decoration: none;
+}
+
+.signup_text_link:hover {
+  color: #6379f4;
+  text-decoration: underline;
+}
