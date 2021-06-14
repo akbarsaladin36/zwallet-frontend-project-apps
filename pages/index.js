@@ -2,86 +2,77 @@ import Layout from "../components/Layout";
 import Navbar from "../components/module/Navbar";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
+// import { connect } from "react-redux";
 import Footer from "../components/module/Footer";
 import Image from "next/image";
-import { FiLogOut } from "react-icons/fi";
-import { RiDashboardLine } from "react-icons/ri";
-import { WiDirectionUp } from "react-icons/wi";
-import { BiPlus } from "react-icons/bi";
-import { FiUser } from "react-icons/fi";
+import LeftColumn from "../components/LeftColumn";
+// import { getUsersByIdData, getBalanceData } from "../redux/actions/dashboard";
+// import { initializeStore } from "../redux/store";
+import { authPage } from "../middleware/authorizationPage";
+import axios from "../utils/axios";
+import Cookie from "js-cookie";
 
-export default function Home() {
+export async function getServerSideProps(context) {
+  const data = await authPage(context);
+  axios.setToken(data.token);
+
+  const user = await axios.axiosApiIntances
+    .get(`users/${data.user}`)
+    .then((res) => {
+      // console.log(res);
+      return res.data.data[0];
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
+  const balance = await axios.axiosApiIntances
+    .get("transaction/balance")
+    .then((res) => {
+      // console.log(res);
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
+  const transactionHistory = await axios.axiosApiIntances
+    .get("transaction?sort=month&limit=4")
+    .then((res) => {
+      console.log(res.data.data);
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
+  // const reduxStore = initializeStore();
+  // const { dispatch } = reduxStore;
+  // dispatch(getUsersByIdData(data.user_id));
+  return {
+    props: { user, balance, transactionHistory },
+  };
+}
+
+export default function Home(props) {
+  const userId = Cookie.get("user");
+  console.log(props);
+  console.log(userId);
   return (
     <Layout title="Home">
       <Navbar />
       <div className="container">
         <div className="row mt-5 justify-content-center">
-          <div className={`${styles.left_column} col-3 shadow`}>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="/">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <RiDashboardLine />
-                      </i>
-                      {"  "}Dashboard
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/search_receiver">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <WiDirectionUp />
-                      </i>
-                      {"  "}Transfer
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/top_up">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <BiPlus />
-                      </i>
-                      {"  "}Top Up
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiUser />
-                      </i>
-                      {"  "}Profile
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiLogOut />
-                      </i>
-                      {"  "}Logout
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <LeftColumn />
           <div className="col-7 ms-3">
             <div className={`${styles.right_column_1} row shadow`}>
               <div className="col mt-3 ms-3">
                 <p>Balance</p>
-                <h1>120.000</h1>
-                <p>+62813-1234-5678</p>
+                <h1>{props.balance}</h1>
+                <p>{props.user.user_phone}</p>
               </div>
               <div className="col">
                 <div className="row">
@@ -115,65 +106,42 @@ export default function Home() {
                     </Link>
                   </div>
                 </div>
-                <div className="row">
-                  <div className="col-7">
-                    <div className="row">
-                      <div className="col-4">
-                        <Image
-                          src="/img/default-profile-picture.jpg"
-                          alt="profile user"
-                          width={60}
-                          height={60}
-                        />
+                {props.transactionHistory.map((item, index) => {
+                  return (
+                    <div className="row" key={index}>
+                      <div className="col-7">
+                        <div className="row">
+                          <div className="col-4">
+                            <Image
+                              src="/img/default-profile-picture.jpg"
+                              alt="profile user"
+                              width={60}
+                              height={60}
+                            />
+                          </div>
+                          <div className="col-8">
+                            <p className={styles.right_column_2_text_3}>
+                              Samuel Suhi
+                            </p>
+                            <p
+                              className={`${styles.right_column_2_text_3} text-muted`}
+                            >
+                              {item.transaction_type ? "Top Up" : "Transfer"}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="col-8">
-                        <p className={styles.right_column_2_text_3}>
-                          Samuel Suhi
-                        </p>
-                        <p
-                          className={`${styles.right_column_2_text_3} text-muted`}
-                        >
-                          Transfer
+                      <div className="col-5 d-flex justify-content-end text-success">
+                        <p className={`${styles.right_column_2_text_3} mt-3`}>
+                          {item.transaction_type
+                            ? `+${item.transaction_amount}`
+                            : `-${item.transaction_amount}`}
                         </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="col-5 d-flex justify-content-end text-success">
-                    <p className={`${styles.right_column_2_text_3} mt-3`}>
-                      +Rp.50.000
-                    </p>
-                  </div>
-                </div>
+                  );
+                })}
                 {/* ****************** */}
-                <div className="row">
-                  <div className="col-7">
-                    <div className="row">
-                      <div className="col-4">
-                        <Image
-                          src="/img/default-profile-picture.jpg"
-                          alt="profile user"
-                          width={60}
-                          height={60}
-                        />
-                      </div>
-                      <div className="col-8">
-                        <p className={styles.right_column_2_text_3}>
-                          Samuel Suhi
-                        </p>
-                        <p
-                          className={`${styles.right_column_2_text_3} text-muted`}
-                        >
-                          Subcription
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-5 d-flex justify-content-end text-danger">
-                    <p className={`${styles.right_column_2_text_3} mt-3`}>
-                      -Rp.149.000
-                    </p>
-                  </div>
-                </div>
                 {/* ****************** */}
               </div>
             </div>
@@ -184,3 +152,12 @@ export default function Home() {
     </Layout>
   );
 }
+
+// const mapStateToProps = (state) => ({
+//   dashboard: state.dashboard,
+// });
+
+// const mapDispatchToProps = { getUsersByIdData, getBalanceData };
+// // (null, mapDispatchToProps)
+// // (mapStateToProps)
+// export default connect(mapStateToProps, mapDispatchToProps)(Home);

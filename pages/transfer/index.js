@@ -4,11 +4,7 @@ import styles from "../../styles/Transfer.module.css";
 import Link from "next/link";
 import Footer from "../../components/module/Footer";
 import Image from "next/image";
-import { FiLogOut } from "react-icons/fi";
-import { RiDashboardLine } from "react-icons/ri";
-import { WiDirectionUp } from "react-icons/wi";
-import { BiPlus } from "react-icons/bi";
-import { FiUser } from "react-icons/fi";
+import LeftColumn from "../../components/LeftColumn";
 
 export default function Transfer() {
   return (
@@ -16,66 +12,7 @@ export default function Transfer() {
       <Navbar />
       <div className="container">
         <div className="row mt-5 justify-content-center">
-          <div className={`${styles.left_column} col-3 shadow`}>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="/">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <RiDashboardLine />
-                      </i>
-                      {"  "}Dashboard
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/search_receiver">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <WiDirectionUp />
-                      </i>
-                      {"  "}Transfer
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/top_up">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <BiPlus />
-                      </i>
-                      {"  "}Top Up
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiUser />
-                      </i>
-                      {"  "}Profile
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiLogOut />
-                      </i>
-                      {"  "}Logout
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <LeftColumn />
           <div className={`${styles.right_column} col-7 ms-3 shadow`}>
             <p className="mt-3">Transfer Money</p>
             <div className="row">

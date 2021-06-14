@@ -1,7 +1,40 @@
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Cookie from "js-cookie";
 import styles from "../../../styles/AddPIN.module.css";
 import Image from "next/image";
+import axios from "../../../utils/axios";
+import { authPage } from "../../../middleware/authorizationPage";
 
-export default function AddPIN() {
+export async function getServerSideProps(context) {
+  await authPage(context);
+  return { props: {} };
+}
+
+export default function AddPIN(props) {
+  const router = useRouter();
+  const [one, setOne] = useState();
+  const [two, setTwo] = useState();
+  const [three, setThree] = useState();
+  const [four, setFour] = useState();
+  const [five, setFive] = useState();
+  const [six, setSix] = useState();
+
+  const handleAddPin = (event) => {
+    event.preventDefault();
+    const setPin = one + two + three + four + five + six;
+    axios.setToken(Cookie.get("token"));
+
+    axios.axiosApiIntances
+      .patch("/users/update-pin", { newPin: setPin })
+      .then((res) => {
+        console.log(res);
+        router.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <div className="row">
@@ -47,13 +80,18 @@ export default function AddPIN() {
             Zwallet app. Keep it secret and don’t tell anyone about your Zwallet
             account password and the PIN.
           </p>
-          <form className={`${styles.form_size} mt-5 ms-4`}>
+          <form
+            className={`${styles.form_size} mt-5 ms-4`}
+            onSubmit={handleAddPin}
+          >
             <div className="row text-center">
               <div className="col-2">
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin1"
+                    onChange={(event) => {
+                      setOne(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"
@@ -64,7 +102,9 @@ export default function AddPIN() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin2"
+                    onChange={(event) => {
+                      setTwo(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"
@@ -75,7 +115,9 @@ export default function AddPIN() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin3"
+                    onChange={(event) => {
+                      setThree(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"
@@ -86,7 +128,9 @@ export default function AddPIN() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin4"
+                    onChange={(event) => {
+                      setFour(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"
@@ -97,7 +141,9 @@ export default function AddPIN() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin5"
+                    onChange={(event) => {
+                      setFive(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"
@@ -108,7 +154,9 @@ export default function AddPIN() {
                 <div className="mb-3">
                   <input
                     type="password"
-                    name="Pin6"
+                    onChange={(event) => {
+                      setSix(event.target.value);
+                    }}
                     id="exampleInputPassword1"
                     maxLength="1"
                     size="2"

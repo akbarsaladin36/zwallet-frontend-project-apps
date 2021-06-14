@@ -4,79 +4,72 @@ import styles from "../../../styles/ChangePIN.module.css";
 import Link from "next/link";
 import Footer from "../../../components/module/Footer";
 import Image from "next/image";
-import { FiLogOut } from "react-icons/fi";
-import { RiDashboardLine } from "react-icons/ri";
-import { WiDirectionUp } from "react-icons/wi";
-import { BiPlus } from "react-icons/bi";
-import { FiUser } from "react-icons/fi";
-import { BiLockAlt } from "react-icons/bi";
+import LeftColumn from "../../../components/LeftColumn";
+import { authPage } from "../../../middleware/authorizationPage";
+import axios from "../../../utils/axios";
+import { useState } from "react";
+import Cookie from "js-cookie";
+
+export async function getServerSideProps(context) {
+  const data = await authPage(context);
+  axios.setToken(data.token);
+
+  const user = await axios.axiosApiIntances
+    .get(`users/${data.user}`)
+    .then((res) => {
+      return res.data.data[0];
+    })
+    .catch((err) => {
+      console.log(err);
+      return {};
+    });
+
+  return {
+    props: { user },
+  };
+}
 
 export default function ChangePIN() {
+  const [pinOne, setPinOne] = useState("");
+  const [pinTwo, setPinTwo] = useState("");
+  const [pinThree, setPinThree] = useState("");
+  const [pinFour, setPinFour] = useState("");
+  const [pinFive, setPinFive] = useState("");
+  const [pinSix, setPinSix] = useState("");
+
+  const handleChangePIN = (event) => {
+    event.preventDefault();
+    const setPin = pinOne + pinTwo + pinThree + pinFour + pinFive + pinSix;
+    axios.setToken(Cookie.get("token"));
+
+    axios.axiosApiIntances
+      .patch("users/update-pin", { newPin: setPin })
+      .then((res) => {
+        console.log(res);
+        setPinOne("");
+        setPinTwo("");
+        setPinThree("");
+        setPinFour("");
+        setPinFive("");
+        setPinSix("");
+      })
+      .catch((err) => {
+        console.log(err);
+        setPinOne("");
+        setPinTwo("");
+        setPinThree("");
+        setPinFour("");
+        setPinFive("");
+        setPinSix("");
+      });
+  };
+
   return (
     <Layout title="Change PIN">
       <Navbar />
       <div className="container">
         <div className="row mt-5 justify-content-center">
-          <div className={`${styles.left_column} col-3 shadow`}>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="/">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <RiDashboardLine />
-                      </i>
-                      {"  "}Dashboard
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/search_receiver">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <WiDirectionUp />
-                      </i>
-                      {"  "}Transfer
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/top_up">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <BiPlus />
-                      </i>
-                      {"  "}Top Up
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/profile/:id">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiUser />
-                      </i>
-                      {"  "}Profile
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiLogOut />
-                      </i>
-                      {"  "}Logout
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <LeftColumn />
           <div className={`${styles.right_column} col-7 ms-3 shadow`}>
             <p>Change PIN</p>
             <p className="text-muted">
@@ -85,13 +78,19 @@ export default function ChangePIN() {
             </p>
             <div className="row">
               <div className="col text-center">
-                <form className={`${styles.form_size} mx-auto`}>
+                <form
+                  className={`${styles.form_size} mx-auto`}
+                  onSubmit={handleChangePIN}
+                >
                   <div className="row text-center">
                     <div className="col-2">
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin1"
+                          onChange={(event) => {
+                            setPinOne(event.target.value);
+                          }}
+                          value={pinOne}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"
@@ -102,7 +101,10 @@ export default function ChangePIN() {
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin2"
+                          onChange={(event) => {
+                            setPinTwo(event.target.value);
+                          }}
+                          value={pinTwo}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"
@@ -113,7 +115,10 @@ export default function ChangePIN() {
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin3"
+                          onChange={(event) => {
+                            setPinThree(event.target.value);
+                          }}
+                          value={pinThree}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"
@@ -124,7 +129,10 @@ export default function ChangePIN() {
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin4"
+                          onChange={(event) => {
+                            setPinFour(event.target.value);
+                          }}
+                          value={pinFour}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"
@@ -135,7 +143,10 @@ export default function ChangePIN() {
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin5"
+                          onChange={(event) => {
+                            setPinFive(event.target.value);
+                          }}
+                          value={pinFive}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"
@@ -146,7 +157,10 @@ export default function ChangePIN() {
                       <div className="mb-3">
                         <input
                           type="password"
-                          name="Pin6"
+                          onChange={(event) => {
+                            setPinSix(event.target.value);
+                          }}
+                          value={pinSix}
                           id="exampleInputPassword1"
                           maxLength="1"
                           size="2"

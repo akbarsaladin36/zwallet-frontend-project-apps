@@ -1,8 +1,48 @@
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Cookie from "js-cookie";
 import styles from "../../../styles/Login.module.css";
 import Image from "next/image";
+import axios from "../../../utils/axios";
 import { BiEnvelope, BiLockAlt } from "react-icons/bi";
+import { unauthPage } from "../../../middleware/authorizationPage";
 
-export default function Login() {
+export async function getServerSideProps(context) {
+  await unauthPage(context);
+  return { props: {} };
+}
+
+export default function Login(props) {
+  const router = useRouter();
+  const [form, setForm] = useState({
+    userName: "",
+    userPassword: "",
+  });
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+    axios.axiosApiIntances
+      .post("auth/login", form)
+      .then((res) => {
+        console.log(res);
+        Cookie.set("token", res.data.data.token, {
+          expires: 1,
+          secure: true,
+        });
+        Cookie.set("user", res.data.data.user_id, {
+          expires: 1,
+          secure: true,
+        });
+        if (res.data.data.user_pin > 0) {
+          router.push("/");
+        } else {
+          router.push("/auth/add_pin");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <div className="row">
@@ -48,7 +88,10 @@ export default function Login() {
             wherever you are. Desktop, laptop, mobile phone? we cover all of
             that for you!
           </p>
-          <form className={`${styles.form_size} mt-5 ms-4`}>
+          <form
+            className={`${styles.form_size} mt-5 ms-4`}
+            onSubmit={handleLogin}
+          >
             <div className="input-group mb-3">
               <span className="input-group-text" id="basic-addon1">
                 <BiEnvelope />
@@ -56,6 +99,9 @@ export default function Login() {
               <input
                 type="email"
                 className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userEmail: event.target.value } });
+                }}
                 placeholder="Email"
                 aria-label="Email"
                 aria-describedby="basic-addon1"
@@ -68,6 +114,9 @@ export default function Login() {
               <input
                 type="password"
                 className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userPassword: event.target.value } });
+                }}
                 placeholder="Password"
                 aria-label="Password"
                 aria-describedby="basic-addon1"

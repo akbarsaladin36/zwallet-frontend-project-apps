@@ -1,8 +1,42 @@
+import { useState } from "react";
+import { useRouter } from "next/router";
 import styles from "../../../styles/Login.module.css";
 import Image from "next/image";
+import axios from "../../../utils/axios";
 import { BiEnvelope, BiLockAlt, BiUser } from "react-icons/bi";
+import { unauthPage } from "../../../middleware/authorizationPage";
 
-export default function Register() {
+export async function getServerSideProps(context) {
+  await unauthPage(context);
+  return { props: {} };
+}
+
+export default function Register(props) {
+  const router = useRouter();
+  const [form, setForm] = useState({
+    userName: "",
+    userEmail: "",
+    userPhone: "",
+    userPassword: "",
+  });
+
+  const handleRegister = (event) => {
+    event.preventDefault();
+    axios.axiosApiIntances
+      .post("auth/register", {
+        userName: form.userName,
+        userEmail: form.userEmail,
+        userPhone: form.userPhone,
+        userPassword: form.userPassword,
+      })
+      .then((res) => {
+        console.log(res);
+        router.push("/login");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <>
       <div className="row">
@@ -48,7 +82,10 @@ export default function Register() {
             wherever you are. Desktop, laptop, mobile phone? we cover all of
             that for you!
           </p>
-          <form className={`${styles.form_size} mt-5 ms-4`}>
+          <form
+            className={`${styles.form_size} mt-5 ms-4`}
+            onSubmit={handleRegister}
+          >
             <div className="input-group mb-3">
               <span className="input-group-text" id="basic-addon1">
                 <BiUser />
@@ -56,6 +93,9 @@ export default function Register() {
               <input
                 type="text"
                 className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userName: event.target.value } });
+                }}
                 placeholder="Username"
                 aria-label="Username"
                 aria-describedby="basic-addon1"
@@ -68,8 +108,26 @@ export default function Register() {
               <input
                 type="email"
                 className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userEmail: event.target.value } });
+                }}
                 placeholder="Email"
                 aria-label="Email"
+                aria-describedby="basic-addon1"
+              />
+            </div>
+            <div className="input-group mb-3 mt-5">
+              <span className="input-group-text" id="basic-addon1">
+                <BiEnvelope />
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userPhone: event.target.value } });
+                }}
+                placeholder="Phone Number"
+                aria-label="Phone Number"
                 aria-describedby="basic-addon1"
               />
             </div>
@@ -80,6 +138,9 @@ export default function Register() {
               <input
                 type="password"
                 className="form-control"
+                onChange={(event) => {
+                  setForm({ ...form, ...{ userPassword: event.target.value } });
+                }}
                 placeholder="Password"
                 aria-label="Password"
                 aria-describedby="basic-addon1"
