@@ -1,169 +1,152 @@
+import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
 import Navbar from "../../components/module/Navbar";
 import styles from "../../styles/History.module.css";
 import Link from "next/link";
 import Footer from "../../components/module/Footer";
 import Image from "next/image";
-import { FiLogOut } from "react-icons/fi";
-import { RiDashboardLine } from "react-icons/ri";
-import { WiDirectionUp } from "react-icons/wi";
-import { BiPlus } from "react-icons/bi";
-import { FiUser } from "react-icons/fi";
+import Cookie from "js-cookie";
+import { authPage } from "../../middleware/authorizationPage";
+import axios from "../../utils/axios";
+import LeftColumn from "components/LeftColumn";
 
-export default function History() {
+export async function getServerSideProps(context) {
+  const data = await authPage(context);
+  axios.setToken(data.token);
+
+  const user = await axios.axiosApiIntances
+    .get(`users/${data.id}`)
+    .then((res) => {
+      console.log(res.data.data[0]);
+      return res.data.data[0];
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return {};
+    });
+
+  const historyWeek = await axios.axiosApiIntances
+    .get("transaction?sort=month&limit=10")
+    .then((res) => {
+      console.log(res.data.data);
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
+  const historyMonth = await axios.axiosApiIntances
+    .get("transaction?sort=week&limit=10")
+    .then((res) => {
+      console.log(res.data.data);
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
+  return {
+    props: { user, historyWeek, historyMonth },
+  };
+}
+
+export default function History(props) {
+  console.log(props);
+  const userId = Cookie.get("user");
+  const [historyWeek, setHistoryWeek] = useState([]);
+  const [historyMonth, setHistoryMonth] = useState([]);
+
+  useEffect(() => {
+    setHistoryWeek(props.historyWeek);
+    setHistoryMonth(props.historyMonth);
+  }, []);
+
   return (
     <Layout title="Transaction History">
       <Navbar />
       <div className="container">
         <div className="row mt-5 justify-content-center">
-          <div className={`${styles.left_column} col-3 shadow`}>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="/">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <RiDashboardLine />
-                      </i>
-                      {"  "}Dashboard
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/search_receiver">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <WiDirectionUp />
-                      </i>
-                      {"  "}Transfer
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="/top_up">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <BiPlus />
-                      </i>
-                      {"  "}Top Up
-                    </a>
-                  </Link>
-                </div>
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiUser />
-                      </i>
-                      {"  "}Profile
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-8 mx-3 my-4">
-                <div className="col mx-3 my-4">
-                  <Link href="#">
-                    <a className={styles.left_column_menu_text}>
-                      <i>
-                        <FiLogOut />
-                      </i>
-                      {"  "}Logout
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <LeftColumn />
           <div className={`${styles.right_column} col-7 ms-3 shadow`}>
             <p>Transaction History</p>
             <p className="text-muted">This Week</p>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
+            {historyWeek.map((item, index) => {
+              return (
+                <div className="row" key={index}>
+                  <div className="col">
+                    <div className="row">
+                      <div className="col-3">
+                        <Image
+                          src="/img/default-profile-picture.jpg"
+                          alt="profile user"
+                          width={60}
+                          height={60}
+                        />
+                      </div>
+                      <div className="col-6">
+                        <p>
+                          {item.transaction_type
+                            ? "Me"
+                            : item.transaction_receiver_id == userId
+                            ? item.senderDetail.user_name
+                            : item.receiverDetail.user_name}
+                        </p>
+                        <p className="text-muted">
+                          {item.transaction_type ? "Top Up" : "Transfer"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Transfer</p>
-                  </div>
-                </div>
-              </div>
-              <div className="col d-flex justify-content-end text-success">
-                <p className="mt-4">+Rp.50.000</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Subscription</p>
+                  <div className="col d-flex justify-content-end text-success">
+                    <p className="mt-4">
+                      {item.transaction_type
+                        ? `+${item.transaction_amount}`
+                        : `-${item.transaction_amount}`}
+                    </p>
                   </div>
                 </div>
-              </div>
-              <div className="col d-flex justify-content-end text-danger">
-                <p className="mt-4">-Rp.149.000</p>
-              </div>
-            </div>
+              );
+            })}
             <p className="text-muted mt-5">This Month</p>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
+            {historyMonth.map((item, index) => {
+              return (
+                <div className="row" key={index}>
+                  <div className="col">
+                    <div className="row">
+                      <div className="col-3">
+                        <Image
+                          src="/img/default-profile-picture.jpg"
+                          alt="profile user"
+                          width={60}
+                          height={60}
+                        />
+                      </div>
+                      <div className="col-6">
+                        <p>
+                          {item.transaction_type
+                            ? "Me"
+                            : item.transaction_receiver_id == userId
+                            ? item.senderDetail.user_name
+                            : item.receiverDetail.user_name}
+                        </p>
+                        <p className="text-muted">
+                          {item.transaction_type ? "Top Up" : "Transfer"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Transfer</p>
-                  </div>
-                </div>
-              </div>
-              <div className="col d-flex justify-content-end text-success">
-                <p className="mt-4">+Rp.150.000</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col">
-                <div className="row">
-                  <div className="col-3">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
-                  </div>
-                  <div className="col-6">
-                    <p>Samuel Suhi</p>
-                    <p className="text-muted">Subscription</p>
+                  <div className="col d-flex justify-content-end text-success">
+                    <p className="mt-4">
+                      {item.transaction_type
+                        ? `+${item.transaction_amount}`
+                        : `-${item.transaction_amount}`}
+                    </p>
                   </div>
                 </div>
-              </div>
-              <div className="col d-flex justify-content-end text-danger">
-                <p className="mt-4">-Rp.249.000</p>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </div>

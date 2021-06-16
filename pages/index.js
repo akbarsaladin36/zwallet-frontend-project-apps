@@ -11,16 +11,18 @@ import LeftColumn from "../components/LeftColumn";
 import { authPage } from "../middleware/authorizationPage";
 import axios from "../utils/axios";
 import Cookie from "js-cookie";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
   axios.setToken(data.token);
 
-  const user = await axios.axiosApiIntances
-    .get(`users/${data.user}`)
+  const transactionHistory = await axios.axiosApiIntances
+    .get("transaction?sort=month&limit=4")
     .then((res) => {
-      // console.log(res);
-      return res.data.data[0];
+      // console.log(res.data.data);
+      return res.data.data;
     })
     .catch((err) => {
       console.log(err.response);
@@ -38,11 +40,11 @@ export async function getServerSideProps(context) {
       return [];
     });
 
-  const transactionHistory = await axios.axiosApiIntances
-    .get("transaction?sort=month&limit=4")
+  const user = await axios.axiosApiIntances
+    .get(`users/${data.user}`)
     .then((res) => {
-      console.log(res.data.data);
-      return res.data.data;
+      // console.log(res);
+      return res.data.data[0];
     })
     .catch((err) => {
       console.log(err.response);
@@ -53,14 +55,27 @@ export async function getServerSideProps(context) {
   // const { dispatch } = reduxStore;
   // dispatch(getUsersByIdData(data.user_id));
   return {
-    props: { user, balance, transactionHistory },
+    props: { transactionHistory, balance, user },
   };
 }
 
 export default function Home(props) {
+  const router = useRouter();
   const userId = Cookie.get("user");
-  console.log(props);
-  console.log(userId);
+  // console.log(userId);
+  // console.log(props.transactionHistory);
+
+  const [data, setData] = useState([]);
+  // console.log(props);
+  // console.log(userId);
+
+  useEffect(() => {
+    setData(props.transactionHistory);
+  }, []);
+
+  const goToSearchReceiver = () => {
+    router.push("/search_receiver");
+  };
   return (
     <Layout title="Home">
       <Navbar />
@@ -77,7 +92,10 @@ export default function Home(props) {
               <div className="col">
                 <div className="row">
                   <div className="col d-flex justify-content-end mt-4">
-                    <button className={`${styles.right_button_column_1} btn`}>
+                    <button
+                      className={`${styles.right_button_column_1} btn`}
+                      onClick={goToSearchReceiver}
+                    >
                       Transfer
                     </button>
                   </div>
@@ -106,7 +124,7 @@ export default function Home(props) {
                     </Link>
                   </div>
                 </div>
-                {props.transactionHistory.map((item, index) => {
+                {data.map((item, index) => {
                   return (
                     <div className="row" key={index}>
                       <div className="col-7">
@@ -121,7 +139,11 @@ export default function Home(props) {
                           </div>
                           <div className="col-8">
                             <p className={styles.right_column_2_text_3}>
-                              Samuel Suhi
+                              {item.transaction_type
+                                ? "Me"
+                                : item.transaction_receiver_id == userId
+                                ? item.senderDetail.user_name
+                                : item.receiverDetail.user_name}
                             </p>
                             <p
                               className={`${styles.right_column_2_text_3} text-muted`}
