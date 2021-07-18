@@ -14,13 +14,11 @@ import { useEffect, useState } from "react";
 export async function getServerSideProps(context) {
   const data = await authPage(context);
   axios.setToken(data.token);
-  console.log(data);
   const { id } = context.query;
 
   const user = await axios.axiosApiIntances
     .get(`users/${data.user}`)
     .then((res) => {
-      console.log(res.data.data[0]);
       return res.data.data[0];
     })
     .catch((err) => {
@@ -29,20 +27,18 @@ export async function getServerSideProps(context) {
     });
 
   const receiverBalance = await axios.axiosApiIntances
-    .get(`transaction/balance/${id}`)
+    .get(`transaction/balance/${data.user}`)
     .then((res) => {
-      // console.log(res.data.data[0]);
       return res.data.data;
     })
     .catch((err) => {
       console.log(err.response);
-      return [];
+      return {};
     });
 
   const receiver = await axios.axiosApiIntances
     .get(`users/${id}`)
     .then((res) => {
-      console.log(res.data.data[0]);
       return res.data.data[0];
     })
     .catch((err) => {
@@ -56,13 +52,58 @@ export async function getServerSideProps(context) {
 }
 
 export default function Transfer(props) {
-  const router = useRouter();
-  axios.setToken(Cookie.get("token"));
   console.log(props);
+  const router = useRouter();
+  const token = Cookie.get("token");
+  // const sender = Cookie.get("user");
+  axios.setToken(token);
+
+  const [receiverId, setReceiverId] = useState(props.receiver.user_id);
+  // const [senderId, setSenderId] = useState(sender);
+  const [transferAmount, setTransferAmount] = useState(0);
+  const [transferNote, setTransferNote] = useState("");
+  const [senderBalance, setSenderBalance] = useState(props.receiverBalance);
+  const [receiverName, setReceiverName] = useState(props.receiver.user_name);
+  const [receiverPhoneNumber, setReceiverPhoneNumber] = useState(
+    props.receiver.user_phone
+  );
+
+  const goToConfirmation = (id) => {
+    const transferInformation = {
+      receiverId: parseInt(receiverId),
+      transferAmount: transferAmount,
+      transferNote: transferNote,
+      senderBalance: senderBalance - transferAmount,
+      receiverName: receiverName,
+      receiverPhoneNumber: receiverPhoneNumber,
+    };
+    // console.log(transferInformation);
+    if (transferAmount > props.receiverBalance) {
+      console.log("Your balance is out. Please top up.");
+    } else {
+      axios.axiosApiIntances
+        .get(`users/${id}`)
+        .then((res) => {
+          Cookie.set("receiverId", transferInformation.receiverId);
+          Cookie.set("transferAmount", transferInformation.transferAmount);
+          Cookie.set("transferNote", transferInformation.transferNote);
+          Cookie.set("senderBalance", transferInformation.senderBalance);
+          Cookie.set("receiverName", transferInformation.receiverName);
+          Cookie.set(
+            "receiverPhoneNumber",
+            transferInformation.receiverPhoneNumber
+          );
+          router.push(`/confirmation/${props.receiver.user_id}`);
+        })
+        .catch((err) => {
+          console.log(err.response);
+        });
+    }
+  };
 
   return (
     <Layout title="Transfer">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />
@@ -94,37 +135,46 @@ export default function Transfer(props) {
               <div className="col d-flex justify-content-center">
                 <div className="row">
                   <div className="col-12 text-center mx-auto">
-                    <form>
-                      <div className="mb-3">
-                        <input
-                          type="text"
-                          className={styles.right_column_input_1}
-                          id="exampleFormControlInput1"
-                          placeholder="00.0"
-                          size="10"
-                        />
+                    <div className="mb-3">
+                      <input
+                        type="text"
+                        className={styles.right_column_input_1}
+                        id="exampleFormControlInput1"
+                        placeholder="00.0"
+                        value={transferAmount}
+                        onChange={(event) =>
+                          setTransferAmount(event.target.value)
+                        }
+                        size="10"
+                      />
+                    </div>
+                    <p>Rp{props.receiverBalance} Available</p>
+                    <div className="mb-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="exampleFormControlInput1"
+                        placeholder="Add some notes"
+                        name="transferNote"
+                        value={transferNote}
+                        onChange={(event) =>
+                          setTransferNote(event.target.value)
+                        }
+                        size="10"
+                      />
+                    </div>
+                    <div className="row">
+                      <div className="col-12">
+                        <button
+                          onClick={() => {
+                            goToConfirmation(props.receiver.user_id);
+                          }}
+                          className={`${styles.right_column_button_1} btn mb-3 mt-5`}
+                        >
+                          Continue
+                        </button>
                       </div>
-                      <p>Rp{props.receiverBalance} Available</p>
-                      <div className="mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="exampleFormControlInput1"
-                          placeholder="Add some notes"
-                          size="10"
-                        />
-                      </div>
-                      <div className="row">
-                        <div className="col-12">
-                          <button
-                            type="submit"
-                            className={`${styles.right_column_button_1} btn mb-3 mt-5`}
-                          >
-                            Continue
-                          </button>
-                        </div>
-                      </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>

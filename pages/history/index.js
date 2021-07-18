@@ -13,9 +13,10 @@ import LeftColumn from "components/LeftColumn";
 export async function getServerSideProps(context) {
   const data = await authPage(context);
   axios.setToken(data.token);
+  // const { id } = context.query;
 
   const user = await axios.axiosApiIntances
-    .get(`users/${data.id}`)
+    .get(`users/${data.user}`)
     .then((res) => {
       console.log(res.data.data[0]);
       return res.data.data[0];
@@ -26,7 +27,7 @@ export async function getServerSideProps(context) {
     });
 
   const historyWeek = await axios.axiosApiIntances
-    .get("transaction?sort=month&limit=10")
+    .get("transaction?sort=month&limit=5")
     .then((res) => {
       console.log(res.data.data);
       return res.data.data;
@@ -37,7 +38,7 @@ export async function getServerSideProps(context) {
     });
 
   const historyMonth = await axios.axiosApiIntances
-    .get("transaction?sort=week&limit=10")
+    .get("transaction?sort=week&limit=5")
     .then((res) => {
       console.log(res.data.data);
       return res.data.data;
@@ -53,7 +54,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function History(props) {
-  console.log(props);
+  // console.log(props);
   const userId = Cookie.get("user");
   const [historyWeek, setHistoryWeek] = useState([]);
   const [historyMonth, setHistoryMonth] = useState([]);
@@ -65,7 +66,7 @@ export default function History(props) {
 
   return (
     <Layout title="Transaction History">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />
@@ -78,12 +79,24 @@ export default function History(props) {
                   <div className="col">
                     <div className="row">
                       <div className="col-3">
-                        <Image
-                          src="/img/default-profile-picture.jpg"
-                          alt="profile user"
-                          width={60}
-                          height={60}
-                        />
+                        {item.transaction_type ? (
+                          <Image
+                            src="/img/default-profile-picture.jpg"
+                            alt="profile user"
+                            width={60}
+                            height={60}
+                          />
+                        ) : (
+                          <img
+                            src={`http://localhost:5000/backend4/api/${
+                              item.transaction_receiver_id == userId
+                                ? item.senderDetail.user_image
+                                : item.receiverDetail.user_image
+                            }`}
+                            alt="profile user"
+                            className={`${styles.profile_picture_size} rounded-circle`}
+                          />
+                        )}
                       </div>
                       <div className="col-6">
                         <p>
@@ -99,12 +112,16 @@ export default function History(props) {
                       </div>
                     </div>
                   </div>
-                  <div className="col d-flex justify-content-end text-success">
-                    <p className="mt-4">
-                      {item.transaction_type
-                        ? `+${item.transaction_amount}`
-                        : `-${item.transaction_amount}`}
-                    </p>
+                  <div className="col d-flex justify-content-end">
+                    {item.transaction_type ? (
+                      <p className="mt-4 text-success">
+                        {`+Rp.${item.transaction_amount}`}
+                      </p>
+                    ) : (
+                      <p className="mt-4 text-danger">
+                        {`-Rp.${item.transaction_amount}`}
+                      </p>
+                    )}
                   </div>
                 </div>
               );
@@ -116,12 +133,24 @@ export default function History(props) {
                   <div className="col">
                     <div className="row">
                       <div className="col-3">
-                        <Image
-                          src="/img/default-profile-picture.jpg"
-                          alt="profile user"
-                          width={60}
-                          height={60}
-                        />
+                        {item.transaction_type ? (
+                          <Image
+                            src="/img/default-profile-picture.jpg"
+                            alt="profile user"
+                            width={60}
+                            height={60}
+                          />
+                        ) : (
+                          <img
+                            src={`http://localhost:5000/backend4/api/${
+                              item.transaction_receiver_id == userId
+                                ? item.senderDetail.user_image
+                                : item.receiverDetail.user_image
+                            }`}
+                            alt="profile user"
+                            className={`${styles.profile_picture_size} rounded-circle`}
+                          />
+                        )}
                       </div>
                       <div className="col-6">
                         <p>
@@ -137,12 +166,16 @@ export default function History(props) {
                       </div>
                     </div>
                   </div>
-                  <div className="col d-flex justify-content-end text-success">
-                    <p className="mt-4">
-                      {item.transaction_type
-                        ? `+${item.transaction_amount}`
-                        : `-${item.transaction_amount}`}
-                    </p>
+                  <div className="col d-flex justify-content-end">
+                    {item.transaction_type ? (
+                      <p className="mt-4 text-success">
+                        {`+Rp.${item.transaction_amount}`}
+                      </p>
+                    ) : (
+                      <p className="mt-4 text-danger">
+                        {`-Rp.${item.transaction_amount}`}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

@@ -10,6 +10,7 @@ import axios from "../../utils/axios";
 import { useEffect, useState } from "react";
 import Cookie from "js-cookie";
 import { useRouter } from "next/router";
+import ReactPaginate from "react-paginate";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
@@ -40,6 +41,7 @@ export default function SearchReceiver(props) {
   const [sortReceiver, setSortReceiver] = useState("user_name ASC");
   const [page, setPage] = useState(1);
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({});
   const [receiverData, setReceiverData] = useState({});
   const limit = 7;
 
@@ -51,6 +53,7 @@ export default function SearchReceiver(props) {
         )
         .then((res) => {
           setData(res.data.data);
+          setPagination(res.data.pagination);
         })
         .catch((err) => {
           console.log(err.response);
@@ -72,9 +75,14 @@ export default function SearchReceiver(props) {
       });
   };
 
+  const handlePageClick = (event) => {
+    const selectedPage = event.selected + 1;
+    setPage(selectedPage);
+  };
+
   return (
     <Layout title="Search Receiver">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />
@@ -89,6 +97,15 @@ export default function SearchReceiver(props) {
                 aria-label="Search receiver here"
                 aria-describedby="basic-addon1"
               />
+              <select
+                id="inputGroupSelect03"
+                aria-label="Example select with button addon"
+                onChange={(event) => setSortReceiver(event.target.value)}
+                className={styles.sort_search_receiver}
+              >
+                <option value="user_name ASC">Name A-z</option>
+                <option value="user_name DESC">Name Z-a</option>
+              </select>
             </div>
             {data.map((item, index) => {
               if (item.user_id !== props.user.user_id) {
@@ -123,6 +140,25 @@ export default function SearchReceiver(props) {
                 return "";
               }
             })}
+            {data.length > 0 ? (
+              <div className="mt-5 d-flex justify-content-center">
+                <ReactPaginate
+                  previousLabel={"prev"}
+                  nextLabel={"next"}
+                  breakLabel={"..."}
+                  breakClassName={"break-me"}
+                  pageCount={pagination.totalPage ? pagination.totalPage : 0}
+                  marginPagesDisplayed={5}
+                  pageRangeDisplayed={5}
+                  onPageChange={handlePageClick}
+                  containerClassName={styles.pagination}
+                  subContainerClassName={`${styles.pages} ${styles.pagination}`}
+                  activeClassName={styles.active}
+                />
+              </div>
+            ) : (
+              ""
+            )}
             {/* *************** */}
           </div>
         </div>

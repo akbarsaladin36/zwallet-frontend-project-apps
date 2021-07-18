@@ -8,6 +8,8 @@ import Image from "next/image";
 import LeftColumn from "../../components/LeftColumn";
 import { authPage } from "../../middleware/authorizationPage";
 import axios from "../../utils/axios";
+import Cookie from "js-cookie";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
@@ -16,7 +18,6 @@ export async function getServerSideProps(context) {
   const user = await axios.axiosApiIntances
     .get(`users/${data.user}`)
     .then((res) => {
-      // console.log(res);
       return res.data.data[0];
     })
     .catch((err) => {
@@ -30,31 +31,76 @@ export async function getServerSideProps(context) {
 }
 
 export default function Profile(props) {
-  const [showImage, setShowImage] = useState(null);
+  const router = useRouter();
+  const token = Cookie.get("token");
+  axios.setToken(token);
+
+  const [showImage, setShowImage] = useState(
+    `${process.env.BASE_IMAGE_URL}${props.user.user_image}`
+  );
+
+  const goToEditProfile = () => {
+    const id = Cookie.get("user");
+    router.push(`/profile/edit_profile/${id}`);
+  };
+
+  const handleUserProfileImage = (event) => {
+    const formData = new FormData();
+    formData.append("userImage", event.target.files[0]);
+    axios.axiosApiIntances
+      .patch("users/update-image", formData)
+      .then((res) => {
+        console.log(res);
+        setShowImage(`${process.env.BASE_IMAGE_URL} ${props.user.user_image}`);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
 
   return (
     <Layout title="Profile">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />
           <div className={`${styles.right_column} col-7 ms-3 shadow`}>
             <div className="row mt-5">
               <div className="col text-center">
-                <Image
-                  src={
-                    showImage
-                      ? `${process.env.BASE_IMAGE_URL}${props.user.user_image}`
-                      : "/img/default-profile-picture.jpg"
-                  }
-                  alt="profile user"
-                  width={60}
-                  height={60}
-                />
+                <div className={styles.image_upload}>
+                  <label htmlFor="file-input">
+                    {showImage ? (
+                      <img
+                        src={`http://localhost:5000/backend4/api/${props.user.user_image}`}
+                        alt="profile user"
+                        className={`${styles.profile_picture_size} rounded-circle`}
+                      />
+                    ) : (
+                      <Image
+                        src="/img/default-profile-picture.jpg"
+                        alt="profile user"
+                        width={60}
+                        height={60}
+                      />
+                    )}
+                  </label>
+                  <input
+                    id="file-input"
+                    type="file"
+                    style={{ display: "none" }}
+                    onChange={(event) => handleUserProfileImage(event)}
+                  />
+                </div>
+
                 <br />
-                <Link href="/profile/edit_profile">
-                  <a className="text-muted">Edit</a>
-                </Link>
+                <div>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={goToEditProfile}
+                  >
+                    Edit
+                  </button>
+                </div>
                 <p>{props.user.user_name}</p>
                 <p>{props.user.user_phone}</p>
               </div>
@@ -65,7 +111,7 @@ export default function Profile(props) {
                 <div
                   className={`${styles.right_column_link_1} col mx-auto mb-3`}
                 >
-                  <Link href="/profile/personal_information">
+                  <Link href={"/profile/personal_information"}>
                     <a className={`${styles.right_column_link_2}`}>
                       Personal Information
                     </a>

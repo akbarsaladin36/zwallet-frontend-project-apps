@@ -32,7 +32,7 @@ export default function PersonalInformation(props) {
   console.log(props);
   return (
     <Layout title="Personal Information">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />

@@ -20,3 +20,8 @@
   border: 1px solid white;
   border-radius: 10px;
 }
+
+.profile_picture_size {
+  width: 60px;
+  height: 60px;
+}

@@ -29,7 +29,7 @@ export async function getServerSideProps(context) {
   };
 }
 
-export default function ChangePIN() {
+export default function ChangePIN(props) {
   const [pinOne, setPinOne] = useState("");
   const [pinTwo, setPinTwo] = useState("");
   const [pinThree, setPinThree] = useState("");
@@ -66,7 +66,7 @@ export default function ChangePIN() {
 
   return (
     <Layout title="Change PIN">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />

@@ -76,3 +76,12 @@
   text-decoration: none;
   color: black;
 }
+
+.image-upload > input {
+  display: none;
+}
+
+.profile_picture_size {
+  width: 60px;
+  height: 60px;
+}

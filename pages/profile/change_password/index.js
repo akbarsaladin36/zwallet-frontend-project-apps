@@ -65,7 +65,7 @@ export default function ChangePassword(props) {
 
   return (
     <Layout title="Change Password">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />

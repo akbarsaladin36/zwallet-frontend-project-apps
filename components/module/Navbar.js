@@ -1,8 +1,22 @@
 import { BiBell } from "react-icons/bi";
 import styles from "../../styles/Navbar.module.css";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
-export default function Navbar() {
+export default function Navbar(props) {
+  const router = useRouter();
+  const userName = props.user.user_name;
+  const userPhoneNumber = props.user.user_phone;
+  const userImage = props.user.user_image;
+
+  const [showImage, setShowImage] = useState(
+    `${process.env.BASE_IMAGE_URL}${props.user.user_image}`
+  );
+
+  const handleUserProfile = () => {
+    router.push("/profile");
+  };
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
@@ -26,16 +40,28 @@ export default function Navbar() {
               <li className="nav-item mt-3">
                 <div className="row">
                   <div className="col-4">
-                    <Image
-                      src="/img/default-profile-picture.jpg"
-                      alt="profile user"
-                      width={60}
-                      height={60}
-                    />
+                    {showImage ? (
+                      <img
+                        src={`http://localhost:5000/backend4/api/${userImage}`}
+                        alt="profile user"
+                        className={`${styles.profile_picture_size} rounded-circle`}
+                      />
+                    ) : (
+                      <Image
+                        src="/img/default-profile-picture.jpg"
+                        alt="profile user"
+                        width={60}
+                        height={60}
+                      />
+                    )}
                   </div>
-                  <div className={`${styles.profile_user_text} col-8`}>
-                    <p>M. Akbar Saladin</p>
-                    <p>+6281-1234-5678</p>
+                  <div
+                    className={`${styles.profile_user_text} col-8`}
+                    onClick={handleUserProfile}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p>{userName}</p>
+                    <p>{userPhoneNumber}</p>
                   </div>
                 </div>
               </li>

@@ -5,11 +5,32 @@ import Link from "next/link";
 import Footer from "../../components/module/Footer";
 import Image from "next/image";
 import LeftColumn from "../../components/LeftColumn";
+import { authPage } from "../../middleware/authorizationPage";
+import axios from "../../utils/axios";
+
+export async function getServerSideProps(context) {
+  const data = await authPage(context);
+  axios.setToken(data.token);
+
+  const user = await axios.axiosApiIntances
+    .get(`users/${data.user}`)
+    .then((res) => {
+      return res.data.data[0];
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return {};
+    });
+
+  return {
+    props: { user },
+  };
+}
 
 export default function TopUp() {
   return (
     <Layout title="Top Up">
-      <Navbar />
+      <Navbar user={props.user} />
       <div className="container">
         <div className="row mt-5 justify-content-center">
           <LeftColumn />

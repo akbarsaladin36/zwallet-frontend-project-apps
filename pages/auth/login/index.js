@@ -6,6 +6,7 @@ import Image from "next/image";
 import axios from "../../../utils/axios";
 import { BiEnvelope, BiLockAlt } from "react-icons/bi";
 import { unauthPage } from "../../../middleware/authorizationPage";
+import Layout from "../../../components/Layout";
 
 export async function getServerSideProps(context) {
   await unauthPage(context);
@@ -15,36 +16,48 @@ export async function getServerSideProps(context) {
 export default function Login(props) {
   const router = useRouter();
   const [form, setForm] = useState({
-    userName: "",
+    userEmail: "",
     userPassword: "",
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const handleLogin = (event) => {
     event.preventDefault();
-    axios.axiosApiIntances
-      .post("auth/login", form)
-      .then((res) => {
-        console.log(res);
-        Cookie.set("token", res.data.data.token, {
-          expires: 1,
-          secure: true,
+    if (form.userEmail === "" && form.userPassword === "") {
+      setShowError("Fill all the form to login!");
+    } else if (form.userEmail === "") {
+      setShowError("Fill your email form now!");
+    } else if (form.userPassword === "") {
+      setShowError("Fill your password form now!");
+    } else {
+      axios.axiosApiIntances
+        .post("auth/login", form)
+        .then((res) => {
+          setShowSuccess(res.data.msg);
+          setShowError(false);
+          Cookie.set("token", res.data.data.token, {
+            expires: 1,
+            secure: true,
+          });
+          Cookie.set("user", res.data.data.user_id, {
+            expires: 1,
+            secure: true,
+          });
+          if (res.data.data.user_pin.length > 0) {
+            router.push("/");
+          } else {
+            router.push("/auth/add_pin");
+          }
+        })
+        .catch((err) => {
+          setShowError(err.response.data.msg);
+          setShowSuccess(false);
         });
-        Cookie.set("user", res.data.data.user_id, {
-          expires: 1,
-          secure: true,
-        });
-        if (res.data.data.user_pin > 0) {
-          router.push("/");
-        } else {
-          router.push("/auth/add_pin");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }
   };
   return (
-    <>
+    <Layout title="Login">
       <div className="row">
         <div className={`${styles.left_column} col`}>
           <div className={styles.zwallet_text}>
@@ -123,6 +136,16 @@ export default function Login(props) {
               />
             </div>
             <p className="float-end">Forgot Password?</p>
+            {showSuccess && (
+              <div className="alert alert-success mt-5" role="alert">
+                {showSuccess}
+              </div>
+            )}
+            {showError && (
+              <div className="alert alert-danger mt-5" role="alert">
+                {showError}
+              </div>
+            )}
             <button
               type="submit"
               className={`${styles.signin_button} btn mt-4`}
@@ -140,6 +163,6 @@ export default function Login(props) {
           </form>
         </div>
       </div>
-    </>
+    </Layout>
   );
 }
