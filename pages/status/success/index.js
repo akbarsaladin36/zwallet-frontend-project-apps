@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
-  const data = authPage(context);
+  const data = await authPage(context);
   axios.setToken(data.token);
   const date = Date(Date.now());
 
@@ -33,9 +33,9 @@ export async function getServerSideProps(context) {
 }
 
 export default function StatusSuccess(props) {
-  // console.log(props);
   const router = useRouter();
   const token = Cookie.get("token");
+  const user = Cookie.get("user");
   axios.setToken(token);
 
   const receiverData = Cookie.get("receiverId");
