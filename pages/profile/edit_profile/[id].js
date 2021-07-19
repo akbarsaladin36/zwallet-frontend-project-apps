@@ -47,20 +47,6 @@ export default function EditProfile(props) {
     });
   };
 
-  const handleUserProfileImage = (event) => {
-    const formData = new FormData();
-    formData.append("userImage", URL.createObjectURL(event.target.files[0]));
-    axios.axiosApiIntances
-      .patch("users/update-image", formData)
-      .then((res) => {
-        console.log(res);
-        router.push("/profile");
-      })
-      .catch((err) => {
-        console.log(err.response);
-      });
-  };
-
   const handleUpdateProfile = () => {
     axios.axiosApiIntances
       .patch("users/update-profile", form)
@@ -126,23 +112,6 @@ export default function EditProfile(props) {
               </div>
             </div>
             {/* ************** */}
-            <div className="row">
-              <div className={`${styles.right_column_1} col mt-3 shadow`}>
-                <div className="row">
-                  <div className="col">
-                    <div className="mb-3">
-                      <label className="form-label">Profile Image</label>
-                      <input
-                        type="file"
-                        className="form-control"
-                        placeholder="Profile Image"
-                        onChange={(event) => handleUserProfileImage(event)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
             {/* ************** */}
             <button
               className={`${styles.right_column_button_1} btn float-end mt-3 mb-3`}
