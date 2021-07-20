@@ -2,14 +2,14 @@ import { useState } from "react";
 import Layout from "../../../components/Layout";
 import Navbar from "../../../components/module/Navbar";
 import styles from "../../../styles/PersonalInformation.module.css";
-// import Link from "next/link";
 import LeftColumn from "../../../components/LeftColumn";
 import Footer from "../../../components/module/Footer";
-import Image from "next/image";
 import axios from "../../../utils/axios";
 import { authPage } from "../../../middleware/authorizationPage";
-import Link from "next/link";
 import Cookie from "js-cookie";
+import { connect } from "react-redux";
+import { updateProfileData } from "../../../redux/actions/profile";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
@@ -30,8 +30,8 @@ export async function getServerSideProps(context) {
   };
 }
 
-export default function EditProfile(props) {
-  console.log(props);
+function EditProfile(props) {
+  const router = useRouter();
   const token = Cookie.get("token");
   axios.setToken(token);
 
@@ -39,6 +39,8 @@ export default function EditProfile(props) {
     userName: props.user.user_name,
     userPhone: props.user.user_phone,
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const changeText = (event) => {
     setForm({
@@ -48,14 +50,19 @@ export default function EditProfile(props) {
   };
 
   const handleUpdateProfile = () => {
-    axios.axiosApiIntances
-      .patch("users/update-profile", form)
+    props
+      .updateProfileData(form)
       .then((res) => {
-        console.log(res);
-        router.push("/profile");
+        setShowSuccess(res.action.payload.data.msg);
+        setShowError(false);
+        setTimeout(() => {
+          router.push("/profile");
+        }, 3500);
       })
       .catch((err) => {
         console.log(err.response);
+        setShowError(err.action.payload.response.data.msg);
+        setShowSuccess(false);
       });
   };
 
@@ -70,6 +77,16 @@ export default function EditProfile(props) {
             <p className="text-muted">
               You can edit your profile to make completed information as user.
             </p>
+            {showSuccess && (
+              <div className="alert alert-success mt-4" role="alert">
+                {showSuccess}
+              </div>
+            )}
+            {showError && (
+              <div className="alert alert-danger mt-4" role="alert">
+                {showError}
+              </div>
+            )}
             <div className="row">
               <div className={`${styles.right_column_1} col mt-3 shadow`}>
                 <div className="row">
@@ -127,3 +144,10 @@ export default function EditProfile(props) {
     </Layout>
   );
 }
+
+const mapStateToProps = (state) => ({
+  profile: state.profile,
+});
+
+const mapDispatchToProps = { updateProfileData };
+export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);

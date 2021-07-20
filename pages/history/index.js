@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Layout from "../../components/Layout";
 import Navbar from "../../components/module/Navbar";
 import styles from "../../styles/History.module.css";
-import Link from "next/link";
 import Footer from "../../components/module/Footer";
 import Image from "next/image";
 import Cookie from "js-cookie";
@@ -13,38 +12,31 @@ import LeftColumn from "components/LeftColumn";
 export async function getServerSideProps(context) {
   const data = await authPage(context);
   axios.setToken(data.token);
-  // const { id } = context.query;
 
   const user = await axios.axiosApiIntances
     .get(`users/${data.user}`)
     .then((res) => {
-      console.log(res.data.data[0]);
       return res.data.data[0];
     })
     .catch((err) => {
-      console.log(err.response);
       return {};
     });
 
   const historyWeek = await axios.axiosApiIntances
     .get("transaction?sort=month&limit=5")
     .then((res) => {
-      console.log(res.data.data);
       return res.data.data;
     })
     .catch((err) => {
-      console.log(err.response);
       return [];
     });
 
   const historyMonth = await axios.axiosApiIntances
     .get("transaction?sort=week&limit=5")
     .then((res) => {
-      console.log(res.data.data);
       return res.data.data;
     })
     .catch((err) => {
-      console.log(err.response);
       return [];
     });
 

@@ -10,6 +10,8 @@ import { authPage } from "../../middleware/authorizationPage";
 import axios from "../../utils/axios";
 import Cookie from "js-cookie";
 import { useRouter } from "next/router";
+import { BsTrash } from "react-icons/bs";
+import { BsPencilSquare } from "react-icons/bs";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
@@ -52,6 +54,20 @@ export default function Profile(props) {
       .then((res) => {
         console.log(res);
         setShowImage(`${process.env.BASE_IMAGE_URL} ${props.user.user_image}`);
+        router.push("/profile");
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
+  const handleDeleteProfileImage = () => {
+    axios.axiosApiIntances
+      .patch(`users/delete-image`)
+      .then((res) => {
+        console.log(res);
+        setShowImage("");
+        router.push("/profile");
       })
       .catch((err) => {
         console.log(err.response);
@@ -68,7 +84,7 @@ export default function Profile(props) {
             <div className="row mt-5">
               <div className="col text-center">
                 <div className={styles.image_upload}>
-                  <label htmlFor="file-input">
+                  <label htmlFor="file-input" style={{ cursor: "pointer" }}>
                     {showImage ? (
                       <img
                         src={`http://localhost:5000/backend4/api/${props.user.user_image}`}
@@ -93,13 +109,27 @@ export default function Profile(props) {
                 </div>
 
                 <br />
-                <div>
-                  <button
-                    className="btn btn-outline-primary"
-                    onClick={goToEditProfile}
-                  >
-                    Edit
-                  </button>
+                <div className="row mb-3 justify-content-center">
+                  <div className="col-1">
+                    <button
+                      className={`${styles.edit_profile_button} btn btn-outline-primary`}
+                      onClick={goToEditProfile}
+                    >
+                      <i>
+                        <BsPencilSquare />
+                      </i>
+                    </button>
+                  </div>
+                  <div className="col-1">
+                    <button
+                      className={`${styles.delete_image_button} btn btn-outline-danger`}
+                      onClick={handleDeleteProfileImage}
+                    >
+                      <i>
+                        <BsTrash />
+                      </i>
+                    </button>
+                  </div>
                 </div>
                 <p>{props.user.user_name}</p>
                 <p>{props.user.user_phone}</p>
