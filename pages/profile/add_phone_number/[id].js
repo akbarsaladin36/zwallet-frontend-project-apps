@@ -13,9 +13,34 @@ import axios from "../../../utils/axios";
 import { authPage } from "../../../middleware/authorizationPage";
 import LeftColumn from "../../../components/LeftColumn";
 
-export async function getServerSideProps(context) {
+export async function getStaticPaths() {
+  const users = await axios.axiosApiIntances
+    .get("users/?page=1&limit=10&keywords=")
+    .then((res) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err) => {
+      // console.log(err.response);
+      return [];
+    });
+
+  const paths = users.map((item) => ({
+    params: { id: `${item.user_id}` },
+  }));
+
+  console.log(paths);
+
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+export async function getStaticProps(context) {
   const data = await authPage(context);
   axios.setToken(data.token);
+  console.log(context);
 
   const user = await axios.axiosApiIntances
     .get(`users/${data.user}`)
@@ -27,12 +52,23 @@ export async function getServerSideProps(context) {
       return {};
     });
 
+  // const receiver = await axios.axiosApiIntances
+  //   .get(`users/${context.params.id}`)
+  //   .then((res) => {
+  //     return res.data.data[0];
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     return {};
+  //   });
+
   return {
     props: { user },
   };
 }
 
 export default function AddPhoneNumber(props) {
+  console.log(props);
   return (
     <Layout title="Add Phone Number">
       <Navbar user={props.user} />

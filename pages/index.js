@@ -14,6 +14,7 @@ import Cookie from "js-cookie";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Modal, Button, Form } from "react-bootstrap";
+import { Bar } from "react-chartjs-2";
 
 export async function getServerSideProps(context) {
   const data = await authPage(context);
@@ -51,11 +52,18 @@ export async function getServerSideProps(context) {
       return [];
     });
 
-  // const reduxStore = initializeStore();
-  // const { dispatch } = reduxStore;
-  // dispatch(getUsersByIdData(data.user_id));
+  const transactionSummary = await axios.axiosApiIntances
+    .get("transaction/summary")
+    .then((res) => {
+      return res.data.data;
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return [];
+    });
+
   return {
-    props: { transactionHistory, balance, user },
+    props: { transactionHistory, balance, user, transactionSummary },
   };
 }
 
@@ -70,6 +78,45 @@ export default function Home(props) {
   const [amount, setAmount] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const amountIn = parseInt(props.transactionSummary.amountIn);
+  const amountOut = parseInt(props.transactionSummary.amountOut);
+
+  const dayName = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const totalAmountPerDay = [0, 0, 0, 0, 0, 0, 0];
+
+  if (props.transactionSummary.transactionPerDay) {
+    for (const t of props.transactionSummary.transactionPerDay) {
+      if (dayName.indexOf(t.day_name) >= 0) {
+        totalAmountPerDay[dayName.indexOf(t.day_name)] = parseInt(
+          t.total_amount
+        );
+      }
+    }
+  }
+
+  const dataChart = {
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    datasets: [
+      {
+        data: totalAmountPerDay,
+        backgroundColor: ["rgba(99, 121, 244, 0.6)"],
+        borderColor: ["rgba(99, 121, 244, 1)"],
+        borderWidth: 1,
+        backThickness: 10,
+        minBarLength: 2,
+        borderRadius: 4,
+      },
+    ],
+  };
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -97,7 +144,6 @@ export default function Home(props) {
       axios.axiosApiIntances
         .post("transaction", data)
         .then((res) => {
-          // console.log(res);
           setShowSuccess(res.data.msg);
           setShowError(false);
           setTimeout(() => {
@@ -151,7 +197,41 @@ export default function Home(props) {
             </div>
             <div className="row mt-3">
               <div className={`${styles.right_column_3} col-6 shadow`}>
-                Kiri
+                <div className="row mt-3 ms-3">
+                  <div className="col">
+                    <p>Income</p>
+                    <p className="text-success">Rp. {amountIn}</p>
+                  </div>
+                  <div className="col">
+                    <p>Expense</p>
+                    <p className="text-danger">Rp. {amountOut}</p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col">
+                    <Bar
+                      data={dataChart}
+                      options={{
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            display: false,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            display: false,
+                          },
+                          x: {
+                            grid: {
+                              display: false,
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
               <div className={`${styles.right_column_2} col-5 shadow ms-4`}>
                 <div className="row mt-3">
