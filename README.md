@@ -7,7 +7,7 @@
     <a href="https://github.com/akbarsaladin36/zwallet-frontend-project-apps/pulls">Request Feature</a>
   </p>
 
-![Image Banner](public/img/home-screenshoot.jpg)
+![Image Banner](public/img/home-screenshot.jpg)
 
 ## About The Project
 
