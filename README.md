@@ -42,6 +42,14 @@ module.exports = {
 
 5. Type `npm run dev`
 
+## Feature
+
+1. Login and Register User
+2. Update Profile User Data
+3. Update and Delete User Data
+4. Search Receiver's Data
+5. Transfer To Receiver and Top Up Balance 
+
 ## Acknowledgements
 
 - [Axios](https://www.npmjs.com/package/axios)
