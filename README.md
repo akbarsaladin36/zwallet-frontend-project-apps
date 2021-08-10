@@ -46,9 +46,11 @@ module.exports = {
 
 1. Login and Register User
 2. Update Profile User Data
-3. Update and Delete User Data
+3. Update and Delete Profile User Image
 4. Search Receiver's Data
-5. Transfer To Receiver and Top Up Balance 
+5. Transfer To Receiver and Top Up Balance
+6. Update User's PIN for Transfer
+7. Update User's Password 
 
 ## Acknowledgements
 
